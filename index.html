@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no">
-	<script src="js.js"></script>
+	<script src="swipe.js"></script>
 	<title>Hammer</title>
 	<style>
 	body, html {
@@ -11,6 +11,7 @@
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
+		background: #000;
 	}
 	* {
 		margin: 0;
@@ -19,7 +20,7 @@
 		-moz-user-select: none;
 		user-select: none;
 	}
-	
+
 	#wrapper-panels {
 		height: 100%;
 		white-space: nowrap;
@@ -48,14 +49,29 @@
 	[color="green"] {
 		background: green;
 	}
+	[color="pink"] {
+		background: pink;
+	}
+	
+	#counter {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -15px;
+		margin-left: -15px;
+		color: #fff;
+		font-size: 30px;
+	}
 	</style>
 </head>
 <body>
-	<section id="wrapper-panels">
+	<section id="wrapper-panels" data-step="0">
 		<div class="panel" color="red"></div>
 		<div class="panel" color="blue"></div>
 		<div class="panel" color="green"></div>
+		<div class="panel" color="pink"></div>
 	</section>
+	<div id="counter">0</div>
 </body>
 <script>
 
