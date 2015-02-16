@@ -1,17 +1,25 @@
 window.onload = function(){
+	carrousel('wrapper-panels', 'counter');
+}
+
+var carrousel = (function (idWrapperPanels, idCounter){
 	var step = 0;
+	var maxStep = null;
 	var timeStart = null;
 	var touchPos = 0;
 	var despl = 0;
 	var width = window.innerWidth;
 	var timeOutId = null;
-	var maxStep = null;
 
-	var element = document.getElementById('wrapper-panels');
-	var counter = document.getElementById('counter');
+	var element = null;
+	var counter = null;
+
+	element = document.getElementById(idWrapperPanels);
 	element.style.width = widthWrapperPanels(element)+'px';
 	maxStep = element.querySelectorAll('.panel').length;
-
+	if(idCounter){
+		counter = document.getElementById(idCounter);
+	}
 	
 	element.addEventListener("touchstart", function(event){
 		element.classList.remove('transition');
@@ -52,38 +60,39 @@ window.onload = function(){
 	element.addEventListener('transitionend', function(){
 		element.classList.remove('transition');
 	}, false);
-}
 
-function widthWrapperPanels(wrapper){
-	var panels = wrapper.querySelectorAll('.panel');
-	var lengthPanels = panels.length;
-	var widthWrapper = lengthPanels * window.innerWidth
-	var widthPanels = widthWrapper/lengthPanels;
-	for(var i=0; i < lengthPanels; i++){
-		panels[i].style.width = widthPanels+'px';
-	}
-	return widthWrapper;
-}
 
-function nextStep(despl, step, maxStep, fastSwipe){
-	var start = window.innerWidth * (step*-1);
-	var end = start - window.innerWidth;
-	var width = window.innerWidth;
-	var relativeDespl = Math.abs(despl - (start*-1));
-	var percentage = relativeDespl*100/width;
-	var relativeDespl = Math.abs(despl - start);
-	var percentage = relativeDespl*100/width;
-	
-	if(despl < start ){
-		//right
-		if( (fastSwipe || percentage > 35) && maxStep > step+1){
-			return {start: end, step: step+1};
+	function widthWrapperPanels(wrapper){
+		var panels = wrapper.querySelectorAll('.panel');
+		var lengthPanels = panels.length;
+		var widthWrapper = lengthPanels * window.innerWidth
+		var widthPanels = widthWrapper/lengthPanels;
+		for(var i=0; i < lengthPanels; i++){
+			panels[i].style.width = widthPanels+'px';
 		}
-	}else{
-		//left
-		if( (fastSwipe || percentage > 35) && step > 0){
-			return {start: start+width, step: step-1};
-		}
+		return widthWrapper;
 	}
-	return {start: start, step: step};
-}
+
+	function nextStep(despl, step, maxStep, fastSwipe){
+		var start = window.innerWidth * (step*-1);
+		var end = start - window.innerWidth;
+		var width = window.innerWidth;
+		var relativeDespl = Math.abs(despl - (start*-1));
+		var percentage = relativeDespl*100/width;
+		var relativeDespl = Math.abs(despl - start);
+		var percentage = relativeDespl*100/width;
+		
+		if(despl < start ){
+			//right
+			if( (fastSwipe || percentage > 35) && maxStep > step+1){
+				return {start: end, step: step+1};
+			}
+		}else{
+			//left
+			if( (fastSwipe || percentage > 35) && step > 0){
+				return {start: start+width, step: step-1};
+			}
+		}
+		return {start: start, step: step};
+	}
+});
