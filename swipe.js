@@ -8,7 +8,6 @@ var carrousel = (function (idWrapperPanels, idCounter){
 	var timeStart = null;
 	var touchPos = 0;
 	var despl = 0;
-	var width = window.innerWidth;
 	var timeOutId = null;
 
 	var element = null;
@@ -61,11 +60,17 @@ var carrousel = (function (idWrapperPanels, idCounter){
 		element.classList.remove('transition');
 	}, false);
 
+	window.addEventListener("resize", function(){
+		widthWrapperPanels(element);
+		var start = window.innerWidth * (step*-1);
+		element.classList.add('transition');
+		element.style.transform = 'translateX('+start+'px)';
+	});
 
 	function widthWrapperPanels(wrapper){
 		var panels = wrapper.querySelectorAll('.panel');
 		var lengthPanels = panels.length;
-		var widthWrapper = lengthPanels * window.innerWidth
+		var widthWrapper = lengthPanels * window.innerWidth;
 		var widthPanels = widthWrapper/lengthPanels;
 		for(var i=0; i < lengthPanels; i++){
 			panels[i].style.width = widthPanels+'px';
@@ -77,17 +82,17 @@ var carrousel = (function (idWrapperPanels, idCounter){
 		var start = window.innerWidth * (step*-1);
 		var end = start - window.innerWidth;
 		var width = window.innerWidth;
-		var relativeDespl = Math.abs(despl - (start*-1));
-		var percentage = relativeDespl*100/width;
 		var relativeDespl = Math.abs(despl - start);
 		var percentage = relativeDespl*100/width;
 		
 		if(despl < start ){
+			console.log('¡yeah');
 			//right
 			if( (fastSwipe || percentage > 35) && maxStep > step+1){
 				return {start: end, step: step+1};
 			}
 		}else{
+			console.log('¡yeah2');
 			//left
 			if( (fastSwipe || percentage > 35) && step > 0){
 				return {start: start+width, step: step-1};
