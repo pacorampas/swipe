@@ -25,11 +25,12 @@
 		height: 100%;
 		white-space: nowrap;
 		transform: translateX(0);
-		transition: transform 50ms;
+		-webkit-will-change: transform;
+		/*transition: transform 50ms;*/
 	}
 
 	#wrapper-panels.transition {
-		transition: transform 300ms;
+		transition: transform 1000ms;
 	}
 
 	.panel {
