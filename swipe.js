@@ -42,35 +42,21 @@ var carrousel = (function (idWrapperPanels, idCounter){
 		if(timeDiff < 250){
 			fastSwipe = true;
 		}
-
-		var goToNextStep = nextStep(despl, step, maxStep, fastSwipe);
-		
-		touchPos = goToNextStep.start;
-		despl = goToNextStep.start;
-		step = goToNextStep.step;
-		element.classList.add('transition');
-		element.style.transform = 'translate3d('+despl+'px, 0px, 0px)';
-
-		if(counter){
-			element.dataset.step = step;
-			counter.textContent = step;
-		}
+		var theNextStep = nextStepByGesture(fastSwipe);
+		goToStep(theNextStep);
 	}, false);
 
-	element.addEventListener('transitionend', function(){
+	function transitionEnd(){
 		element.classList.remove('transition');
 		//to force relayout else the touch events are lost
 		//http://stackoverflow.com/questions/16703157/android-4-chrome-hit-testing-issue-on-touch-events-after-css-transform
 		element.innerHTML = element.innerHTML;
-	}, false);
+		element.removeEventListener('transitionend', transitionEnd)
+	}
 
 	window.addEventListener("resize", function(){
 		widthWrapperAndPanels(element);
-		var start = window.innerWidth * (step*-1);
-		touchPos = start;
-		despl = start;
-		element.classList.add('transition');
-		element.style.transform = 'translateX('+start+'px)';
+		goToStep(step, true);
 	});
 
 	function widthWrapperAndPanels(wrapper){
@@ -84,26 +70,64 @@ var carrousel = (function (idWrapperPanels, idCounter){
 		}
 	}
 
-	function nextStep(despl, step, maxStep, fastSwipe){
+	function nextStepByGesture(fastSwipe){
 		var start = window.innerWidth * (step*-1);
 		var end = start - window.innerWidth;
 		var width = window.innerWidth;
 		var relativeDespl = Math.abs(despl - start);
 		var percentage = relativeDespl*100/width;
-		
+
 		if(despl < start ){
-			console.log('¡yeah');
 			//right
 			if( (fastSwipe || percentage > 35) && maxStep > step+1){
-				return {start: end, step: step+1};
+				return step+1;
 			}
-		}else{
-			console.log('¡yeah2');
+		}else if(despl > start ){
 			//left
 			if( (fastSwipe || percentage > 35) && step > 0){
-				return {start: start+width, step: step-1};
+				return step-1;
 			}
 		}
-		return {start: start, step: step};
+		return step;
+	}
+
+	function goToStep(newStep, notTransition){
+		if(maxStep <= parseInt(newStep) || 0 > parseInt(newStep)){
+			return false;
+		}
+
+		step = newStep;
+		var start = window.innerWidth * (step*-1);
+		touchPos = start;
+		despl = start;
+		if(!notTransition){
+			element.addEventListener('transitionend', transitionEnd, false);
+			element.classList.add('transition');
+		}
+		element.style.transform = 'translate3d('+despl+'px, 0px, 0px)';
+
+		if(counter){
+			element.dataset.step = step;
+			counter.textContent = step;
+		}
+		
+		nextStepEvent.step = step;
+		element.dispatchEvent(nextStepEvent);
+	}
+
+	var nextStepEvent = new CustomEvent(
+						"nextStepEvent", 
+						{
+							bubbles: true,
+							cancelable: true
+						}
+					);
+
+	return {
+		goToStep: goToStep
 	}
 });
+
+document.addEventListener('nextStepEvent', function (e) {
+	console.log('Evento next step '+e.step);
+}, false);
